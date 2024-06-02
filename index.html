@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обработка изображения</title>
+    <style>
+        #image{
+            width: 25%;
+            padding: 10px;
+            margin: 10px;
+            border: 2px solid;
+        }
+        .sliderContainer {
+            width: 25%;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+        .slider {
+            width: 200px;
+        }
+        h3 {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Обработка изображения</h1>
+    <h3>Учебная практика</h3>
+    <div>
+        <p><input type="file" id="imageFile" onchange="loadImage(event)"></p>
+        <img id="image" src="" alt="Изображение">
+    </div>
+
+    <div class="sliderContainer">
+        <h3>Насыщенность</h3>
+        <input type="range" min="0" max="200" value="100" class="slider" id="saturate">
+        <h3 id="saturateValue"></h3>
+    </div>
+
+    <div class="sliderContainer">
+        <h3>Контраст</h3>
+        <input type="range" min="0" max="200" value="100" class="slider" id="contrast">
+        <h3 id="contrastValue"></h3>
+    </div>
+
+    <div class="sliderContainer">
+        <h3>Яркость</h3>
+        <input type="range" min="0" max="200" value="100" class="slider" id="brightness">
+        <h3 id="brightnessValue"></h3>
+    </div>
+
+    <input type="button" onclick="saveImage()" value="Сохранить изображение">
+
+    <input type="button" onclick="resetSliders()" value="Сбросить фильтры">
+
+    <script>
+        const image = document.getElementById('image');
+
+        const sliderSaturate = document.getElementById("saturate");
+        const sliderSaturateValue = document.getElementById("saturateValue");
+        sliderSaturateValue.innerHTML = sliderSaturate.value + '%';
+        sliderSaturate.oninput = function() {
+            sliderSaturateValue.innerHTML = this.value + '%';
+            image.style.filter = getFilter();
+        }
+
+        const sliderContrast = document.getElementById("contrast");
+        const sliderContrastValue = document.getElementById("contrastValue");
+        sliderContrastValue.innerHTML = sliderContrast.value + '%';
+        sliderContrast.oninput = function() {
+            sliderContrastValue.innerHTML = this.value + '%';
+            image.style.filter = getFilter();
+        }
+
+        const sliderBrightness = document.getElementById("brightness");
+        const sliderBrightnessValue = document.getElementById("brightnessValue");
+        sliderBrightnessValue.innerHTML = sliderBrightness.value + '%';
+        sliderBrightness.oninput = function() {
+            sliderBrightnessValue.innerHTML = this.value + '%';
+            image.style.filter = getFilter();
+        }
+
+        function loadImage(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                image.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function saveImage() {    
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = image.width;
+            canvas.height = image.height;
+            context.filter = getFilter();
+            context.drawImage(image, 0, 0, image.width, image.height);
+            const dataURL = canvas.toDataURL('image/jpeg');
+
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = 'modified_image.jpg';
+            link.click();
+        }
+
+        function resetSliders() {
+            sliderSaturateValue.innerHTML = 100;
+            sliderSaturate.value = 100;
+            sliderContrastValue.innerHTML = 100;
+            sliderContrast.value = 100;
+            sliderBrightnessValue.innerHTML = 100;
+            sliderBrightness.value = 100;
+            image.style.filter = getFilter();
+        }
+
+        function getFilter() {
+            return `brightness(${sliderBrightness.value}%) contrast(${sliderContrast.value}%) saturate(${sliderSaturate.value}%)`
+        }
+
+    </script>
+</body>
+</html>
